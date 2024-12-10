@@ -42,12 +42,13 @@ class TopicController extends Controller
                 'name' => $request['name'],
             ]);
 
-            Alert::success('Success!', 'Added successfully');
-        } catch (\Exception $e) {
-            Alert::error('Error!', 'Failed to add this topic');
+            Alert::success('Success!', 'Topic added successfully');
+            return redirect()->route('topics.index');
 
+        } catch (\Exception $e) {
+            Alert::error('Error!', 'Failed to add this topic! Already exists!');
+            return redirect()->route('topics.create');
         }
-        return redirect()->route('topics.index');
 
 
     }

@@ -1,13 +1,13 @@
 <x-app-layout>
-    
+
     <div class="container my-5">
-        <h1 class="text-center mb-4">Quizzes on {{ $topic->name }}</h1>
+        <h1 class="text-center mb-4">Quizzes on <span class="fw-bolder">{{ ucwords($topic->name) }}</span></h1>
 
         <div class="row">
             @forelse($quizzes as $quiz)
             <div class="col-md-6 col-lg-4 mb-4" >
-                <div class="quiz-card card shadow-sm m-2 {{ $quiz->quiz_type }}" style="height:20em;overflow:hidden">
-                    
+                <div class="quiz-card card shadow-sm m-2" style="height:20em;overflow:hidden">
+
                     <div class="imgquiz">
                         @if($quiz->image)
                         <img src="{{ asset('upload_images/' . $quiz->image) }}" class="card-img-top" alt="{{ $quiz->title }}">
@@ -15,7 +15,7 @@
                         <img src="https://images.pexels.com/photos/207756/pexels-photo-207756.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" class="card-img-top" alt="{{ $quiz->title }}">
                         @endif
                     </div>
-                    
+
                     <div class="card-body">
                         <h5 class="card-title">
                             <a href="{{ route('quiz.show', $quiz->id) }}" class="text-dark text-decoration-none">{{ $quiz->title }}</a>
@@ -24,23 +24,25 @@
 
                         <div class="d-flex justify-content-between align-items-center">
                             <a href="{{ route('quiz.show', $quiz->id) }}" class="btn btn-primary">Start Quiz</a>
-                            @if ($quiz->time_limit)
+
                             <div class="btn btn-warning text-dark" title="with time limit">
-                                <i class="fa-solid fa-stopwatch"></i>
+                                @if ($quiz->time_limit)<i class="fa-solid fa-stopwatch"></i> @endif
+                                @if ($quiz->quiz_type=="multiple_attempts")<i class="bi bi-arrow-repeat"></i> @endif
                             </div>
-                            @endif
-                           
+
+
+
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
 
             @empty
                 <div class="d-flex justify-content-center align-items-center p-4 " style="background-color:rgba(255, 255, 212, 0.389)">
-                    No {{ $topic->name }} quizzes 
+                    No {{ $topic->name }} quizzes
                 </div>
-            
+
             @endforelse
         </div>
         <div class="w-100 d-flex justify-content-center mt-5">

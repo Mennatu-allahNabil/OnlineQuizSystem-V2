@@ -25,6 +25,34 @@
         href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
         rel="stylesheet">
 
+    <style>
+        html{
+            scroll-behavior: smooth;
+        }
+        .go-up-down{
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            width: 2em;
+            gap: 0.25rem;
+            position: fixed;
+            bottom: 1em;
+            right: 1em;
+            z-index: 1000;
+        }
+        #go-up,
+        #go-down{
+            margin-block: 0.25em;
+            width: 1.75em;
+            height: 1.75em;
+            color: white;
+            background-color: #0a58ca;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 2;
+        }
+
+    </style>
 @yield("css_files")
 
 
@@ -34,6 +62,12 @@
 
 <body>
 
+    <div class="go-up-down">
+        <button type="button" id="go-up"><i class="fas fa-chevron-up"></i></button>
+        <button type="button" id="go-down"><i class="fas fa-chevron-down"></i></button>
+    </div>
+
+
     @include('sweetalert::alert')
 
     <div class="main-container d-flex ">
@@ -41,7 +75,7 @@
             <div class="header-box px-2 pt-3 pb-4 d-flex justify-content-between">
                 <h1 class="fs-4 px-2 d-flex align-items-center w-100">
                     <span class="shrink-0 flex items-center px-2">
-                        <a href="{{ route('admin.dashboard') }}">
+                        <a href="{{ route('user_dashboard') }}">
                             <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
                         </a>
                     </span>
@@ -60,40 +94,40 @@
                 </li>
 
                 {{-- topics --}}
-                <li class="text-decoration-none px-3 py-2 d-block text-primary">Topics</li>
+                <li class="text-decoration-none px-3 py-2 d-block text-primary fs-6 fw-bold">Topics Management</li>
                 <li class="{{Route::is('topics.create') ? 'active' : '' }}"><a href="{{route('topics.create')}}"
                         class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between">
-                        <span><i class="fa-regular fa-square-plus"></i></i> Add</span>
+                        <span><i class="fa-solid fa-plus-circle"></i> Add Topic</span>
                     </a>
                 </li>
                 <li class="{{Route::is('topics.index') ? 'active' : '' }}"><a href="{{route('topics.index')}}"
                         class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between">
-                        <span><i class="fal fa-comment"></i> Topics</span>
+                        <span><i class="fa-solid fa-book"></i> Topics</span>
                     </a>
                 </li>
 
             {{--            Quizzes    --}}
-                <li class="text-decoration-none px-3 py-2 d-block text-primary">Quizzes</li>
+                <li class="text-decoration-none px-3 py-2 d-block text-primary fs-6 fw-bold">Quizzes Management</li>
                 <li class="{{Route::is('admin.CreateQuiz') ? 'active' : '' }}">
                     <a href="{{ route('admin.CreateQuiz') }}"
                        class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between">
-                        <span>Create Quiz</span>
+                        <span><i class="fa-solid fa-plus-circle"></i> Create Quiz</span>
                     </a>
                 </li>
 
                 <li class="{{Route::is('quiz.index') ? 'active' : '' }}">
                     <a href="{{ route('quiz.index') }}"
                        class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between">
-                        <span>All Quizzes</span>
+                        <span><i class="fa-solid fa-clipboard-question"></i> All Quizzes</span>
                     </a>
                 </li>
 
-                {{--     results    --}}
-                <li class="text-decoration-none px-3 py-2 d-block text-primary">Results</li>
+{{--                     results    --}}
+                <li class="text-decoration-none px-3 py-2 d-block text-primary fs-6 fw-bold">Results</li>
                 <li class="{{Route::is('quiz.showresults') ? 'active' : '' }}">
                     <a href="{{ route('quiz.showresults') }}"
                        class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between">
-                        <span>Performance Summary</span>
+                        <span><i class="fa-solid fa-chart-bar"></i> Performance Summary</span>
                     </a>
 
                 </li>
@@ -101,13 +135,13 @@
 
 
                 {{-- admins --}}
-                <li class="text-decoration-none px-3 py-2 d-block text-primary">Admins</li>
+                <li class="text-decoration-none px-3 py-2 d-block text-primary fs-6 fw-bold">Users Management</li>
 
                 @if (Auth::user()->role === 'super_admin')
                     <li class="{{Route::is('admins.create') ? 'active' : '' }}">
                         <a href="{{ route('admins.create') }}"
                            class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between">
-                            <span><i class="fa-regular fa-square-plus"></i> Add</span>
+                            <span><i class="fa-solid fa-plus-circle"></i> Add User</span>
                         </a>
                     </li>
                 @endif
@@ -115,20 +149,20 @@
                 <li class="{{Route::is('admins.showall') ? 'active' : '' }}">
                     <a href="{{ route('admins.showall') }}"
                        class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between">
-                        <span>Admins</span>
+                        <span><i class="fa-solid fa-user-shield"></i> Admins</span>
                     </a>
                 </li>
 
                 <li class="{{Route::is('users.showall') ? 'active' : '' }}">
                     <a href="{{ route('users.showall') }}"
                        class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between">
-                        <span>Users</span>
+                        <span><i class="fa-solid fa-user"></i> Quiz Takers</span>
                     </a>
                 </li>
                 <li class="{{Route::is('allusers.showall') ? 'active' : '' }}">
                     <a href="{{ route('allusers.showall') }}"
                        class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between">
-                        <span>All</span>
+                        <span><i class="fa-solid fa-users"></i> All Users</span>
                     </a>
                 </li>
             </ul>
@@ -190,7 +224,7 @@
             </nav>
 
             <div class="dashboard-content  px-3  m-md-5">
-                <h2 class=" fs-5 text-primary mt-3"> @yield('page_title')</h2>
+                <h2 class=" fs-6 text-primary mt-3"> @yield('page_title')</h2>
                 {{$slot}}
             </div>
         </div>
@@ -200,6 +234,19 @@
 <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
 <script src="{{ asset('assets/js/all.min.js') }}"></script>
 <script src="{{ asset('assets/js/jsfile.js') }}"></script>
-
+<script>
+    let go_up=document.getElementById("go-up");
+    let go_down=document.getElementById("go-down");
+    go_up.addEventListener("click",()=>{
+        window.scrollTo({
+            top: 0,
+        });
+    });
+    go_down.addEventListener("click",()=>{
+        window.scrollTo({
+            top: document.documentElement.scrollHeight,
+        });
+    });
+</script>
 @yield("js_files")
 </html>

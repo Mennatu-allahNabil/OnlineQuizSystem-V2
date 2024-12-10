@@ -57,7 +57,62 @@
 
     </div>
     <div id="questions-container" class="col-md-12">
-
+        @foreach (old('questions', []) as $index => $question)
+            <div class="py-3 my-3 col-md-12 border-bottom question">
+                <div class="question-title fw-bolder my-1 fs-4 d-flex justify-content-between">
+                    <span>Question <span class="question-number">{{ $index + 1 }}</span>:</span>
+                    <span>
+                    <button type="button" style="background: none; border: none; cursor: pointer;" class="delete-question-btn">
+                        <i class="fa-regular fa-trash-can text-danger"></i>
+                    </button>
+                </span>
+                </div>
+                <div class="form-group mx-2 my-2 col-md-7 d-flex flex-wrap">
+                    <label class="fw-bold col-md-2 my-1">Question Type</label>
+                    <select name="questions[{{ $index }}][type]" class="form-control col-md-3 question-type">
+                        <option value="true_false" {{ $question['type'] === 'true_false' ? 'selected' : '' }}>True/False</option>
+                        <option value="multiple_choice" {{ $question['type'] === 'multiple_choice' ? 'selected' : '' }}>Multiple Choice</option>
+                    </select>
+                </div>
+                <div class="form-group mx-2 my-2 col-md-12">
+                    <label class="fw-bold col-md-5">Question Text</label>
+                    <input class="form-control col-md-12" name="questions[{{ $index }}][text]" value="{{ $question['text'] }}">
+                </div>
+                <div class="form-group mx-2 my-2 col-md-12">
+                    <label class="fw-bold col-md-5">Question Picture (optional)</label>
+                    <input type="file" class="form-control" name="questions[{{ $index }}][image]">
+                </div>
+                <div class="form-group mx-2 my-2">
+                    <label class="fw-bold my-1">Question Options</label>
+                    <div id="options">
+                        @if ($question['type'] === 'true_false')
+                            <div class="form-group">
+                                <input type="hidden" name="questions[{{ $index }}][options][]" value="True">
+                                <input type="hidden" name="questions[{{ $index }}][options][]" value="False">
+                            </div>
+                            <div class="form-group my-2">
+                                <label>Correct Option</label>
+                                <select class="form-control" name="questions[{{ $index }}][is_correct_number]">
+                                    <option value="1" {{ $question['is_correct_number'] == 1 ? 'selected' : '' }}>True</option>
+                                    <option value="2" {{ $question['is_correct_number'] == 2 ? 'selected' : '' }}>False</option>
+                                </select>
+                            </div>
+                        @elseif ($question['type'] === 'multiple_choice')
+                            @foreach ($question['options'] as $optionIndex => $option)
+                                <div class="form-group my-2">
+                                    <label>Option {{ $optionIndex + 1 }}:</label>
+                                    <input type="text" name="questions[{{ $index }}][options][]" class="form-control" value="{{ $option }}">
+                                </div>
+                            @endforeach
+                            <div class="form-group">
+                                <label>Correct Option</label>
+                                <input type="number" min="1" max="4" class="form-control" name="questions[{{ $index }}][is_correct_number]" value="{{ $question['is_correct_number'] }}">
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endforeach
     </div>
 <div class="col-md-12">
     <button type="button" id="add-question-btn" class="btn btn-primary my-1">Add Question</button>
@@ -72,8 +127,10 @@
 
     @section("js_files")
         <script src="{{asset("assets/js/add_questions.js")}}"></script>
+{{--        <script src="{{asset("assets/js/quiz-form-validation.js")}}"></script>--}}
+
         <script>
-            document.addEventListener("DOMContentLoaded",addQuestion);
+            // document.addEventListener("DOMContentLoaded",addQuestion);
         </script>
         <script>
             let topics=document.getElementsByClassName("topic");

@@ -40,7 +40,7 @@ class QuizController extends Controller
         return view('website.quizzes.index', compact('topic', 'quizzes'));
 
     }
-    
+
     public function getMonths()
     {
         $months = array_combine(
@@ -54,8 +54,8 @@ return $months;
     {
         $questions = $quiz->questions ;
         $questions->each(function ($question) {
-            $question->options = $question->options->shuffle(); 
-        });        
+            $question->options = $question->options->shuffle();
+        });
         $questions= $questions->shuffle();
         // dd($questoins);
         return view('website.quizzes.show', compact('quiz','questions'));
@@ -98,6 +98,50 @@ return $months;
                 "questions.*.options.*" => "required|string",
                 "questions.*.is_correct_number" => "required|integer|min:1|max:4",
                 "created_by" => "required|integer",
+            ],[
+                "title.required" => "The quiz title is required.",
+                "title.string" => "The quiz title must be a valid string.",
+                "title.unique" => "This quiz title has already been used.",
+
+                "description.required" => "The quiz description is required.",
+                "description.string" => "The quiz description must be a valid string.",
+
+                "image.image" => "The image must be an image file.",
+                "image.mimes" => "The image must be of type jpeg, png, jpg, or gif.",
+
+                "quiz_type.required" => "Please select the quiz type.",
+
+                "time_limit.required" => "Time limit is required.",
+                "time_limit.integer" => "Time limit must be an integer.",
+
+                "topic_id.required" => "Topic ID is required.",
+                "topic_id.integer" => "Topic ID must be a valid integer.",
+
+                "questions.required" => "You must add at least one question.",
+                "questions.array" => "Questions must be an array.",
+                "questions.min" => "You must add at least one question.",
+
+                "questions.*.text.required" => "Each question must have text.",
+                "questions.*.text.string" => "Question text must be a valid string.",
+
+                "questions.*.type.required" => "Each question must have a type.",
+                "questions.*.type.string" => "Question type must be a valid string.",
+
+                "questions.*.image.image" => "Question image must be an image file.",
+                "questions.*.image.mimes" => "Question image must be of type jpeg, png, jpg, or gif.",
+
+                "questions.*.options.required" => "Each question must have at least two options.",
+                "questions.*.options.array" => "Options must be an array.",
+                "questions.*.options.min" => "Each question must have at least two options.",
+
+                "questions.*.options.*.required" => "Each option is required.",
+                "questions.*.options.*.string" => "Each option must be a valid string.",
+
+                "questions.*.is_correct_number.required" => "You must select the correct option for each question.",
+                "questions.*.is_correct_number.integer" => "The correct option must be a valid integer.",
+                "questions.*.is_correct_number.min" => "The correct option must be between 1 and 4.",
+                "questions.*.is_correct_number.max" => "The correct option must be between 1 and 4.",
+
             ]);
             DB::transaction(function () use ($request) {
                 $quiz_data = [
@@ -118,21 +162,21 @@ return $months;
             });
             alert::success("Success!","Quiz Added Successfully");
             return redirect()->route("quiz.index");
-        } catch (ValidationException $e) {
-            // Get the error messages
-            $errorMessages = $e->validator->errors()->all();
-            $errorCount = count($errorMessages);
-            $errorMessage = "There are {$errorCount} issues with your input.";
-
-            // Display error message (using toast, assuming it's a function you have)
-            toast($errorMessage, 'error');
-
-            // Redirect back to the previous page
-            return redirect()->back()->withInput(); // Optionally retain the input
+//        } catch (ValidationException $e) {
+//            // Get the error messages
+//            $errorMessages = $e->validator->errors()->all();
+//            $errorCount = count($errorMessages);
+//            $errorMessage = "There are {$errorCount} issues with your input.";
+//
+//            // Display error message (using toast, assuming it's a function you have)
+//            toast($errorMessage, 'error');
+//
+//            // Redirect back to the previous page
+//            return redirect()->back()->withInput(); // Optionally retain the input
         } catch (\Exception $e) {
             // Handle any other exceptions
-            toast('An unexpected error occurred. Please try again.', 'error');
-            return redirect()->back();
+            toast($e->getMessage(), 'error');
+            return redirect()->back()->withInput();;
         }
     }
 
@@ -242,38 +286,38 @@ return $months;
     {
         // الحصول على معرف المستخدم الحالي
         $userId = auth()->id();
-    
+
         // جلب نتائج الأداء
         $results = PerformanceHistory::select(
-            'performance_histories.user_id', 
-            'users.name', 
+            'performance_histories.user_id',
+            'users.name',
             'performance_histories.score',
             'quizzes.title as quizTitle'
         )
         ->join('users', 'performance_histories.user_id', '=', 'users.id')
         ->join('quizzes', 'performance_histories.quiz_id', '=', 'quizzes.id')
         ->get();
-    
+
         // جمع البيانات للرسم البياني
         $quizTitles = Quiz::pluck('title')->toArray(); // سحب عناوين الاختبارات من قاعدة البيانات
         $userCounts = [];
-    
+
         // احصاء عدد المستخدمين الذين قاموا بالاختبار
         foreach ($quizTitles as $title) {
             $quizId = Quiz::where('title', $title)->value('id'); // الحصول على معرف الاختبار
             $userCounts[] = PerformanceHistory::where('quiz_id', $quizId)->count(); // استخدام quiz_id
         }
-    
+
         // حساب المتوسط ونسبة النجاح
         $averageScore = PerformanceHistory::avg('score') ?? 0; // التأكد من أن المتوسط قابل للاستخدام
         $passPercentage = PerformanceHistory::where('score', '>=', 50)->count() / (PerformanceHistory::count() ?: 1) * 100; // تجنب القسمة على صفر
-    
+
         // إرجاع النتائج إلى العرض
         return view('quiz.showresults', compact('results', 'quizTitles', 'userCounts', 'averageScore', 'passPercentage'));
     }
-    
-    
-    
+
+
+
     // here i show quiz and delete
     public function index()
     {
@@ -345,7 +389,7 @@ return $months;
     {
         $months = $this->getMonths();
         $participants = Quiz::with(['performances' => function ($query) {
-            $query->select('id', 'user_id', 'quiz_id','created_at');
+            $query->select('id', 'user_id', 'quiz_id','created_at' ,"score");
         }, 'performances.user' => function ($query) {
             $query->select('id', 'name', 'email');
         }])
@@ -382,8 +426,8 @@ return $months;
     }
 
 
-    //reports 
-   
+    //reports
+
     public function generatePdf($quizId)
 {
     // Check if the user is authenticated
@@ -409,13 +453,13 @@ return $months;
     // Create a new PDF instance
     $pdf = app('dompdf.wrapper');
     $pdf->loadView('pdf.quiz_report', $data);
-    
+
     // Return the generated PDF for download
     return $pdf->download('quiz_report.pdf');
 }
 
-    
 
-    
-    
+
+
+
 }

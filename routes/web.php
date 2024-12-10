@@ -27,7 +27,7 @@ use App\Http\Controllers\Auth\ResendVerificationEmailController;
 
 Route::get('/', function () {
     return view('dashboard');
-})->middleware('verified_if_authenticated');;
+})->middleware('verified_if_authenticated')->name("user_dashboard");
 
 
 Route::get('/dashboard', function () {

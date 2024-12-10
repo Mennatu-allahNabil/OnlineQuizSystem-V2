@@ -100,7 +100,7 @@ class AdminController extends Controller
     public function allusers()
     {
         $title = 'All Users';
-        $admins =   User::latest()->get();
+        $admins =   User::where('role', '!=', 'super_admin')->latest()->get();;
         return view('Dashboard.admins', compact('admins', 'title'));
     }
 

@@ -8,7 +8,7 @@
 <template id="multiple-choice-correct">
     <div class="form-group">
         <label>Correct Option</label>
-        <input type="number" min="1" max="4" class="form-control" name="questions[index][is_correct_number]">
+        <input type="number"  class="form-control" name="questions[index][is_correct_number]">
     </div>
 </template>
 
@@ -49,11 +49,11 @@
         </div>
         <div class="form-group mx-2 my-2 col-md-12">
             <label class="fw-bold  col-md-5">Question Text</label>
-            <input class="form-control col-md-12" name="questions[index][text]">
+            <input class="form-control col-md-12" name="questions[index][text]" {{old("questions[index][text]","")}}>
         </div>
         <div class="form-group mx-2 my-2 col-md-12">
             <label class="fw-bold  col-md-5">Question Picture (optional)</label>
-            <input type="file" class="form-control" name="questions[index][image]">
+            <input type="file" class="form-control" name="questions[index][image]" >
         </div>
         <div class="form-group mx-2 my-2 ">
             <label class="fw-bold my-1">Question options</label>

@@ -4,7 +4,7 @@ let true_false_question=document.getElementById("true-false-question");
 
 let questions=document.getElementById("questions-container");
 let add_question_btn=document.getElementById("add-question-btn");
-let QuestionsCounter=0;
+let QuestionsCounter = document.querySelectorAll(".question").length;
 
 questions.addEventListener("click", function(e) {
     if (e.target.classList.contains("delete-question-btn") ||
@@ -60,6 +60,9 @@ function addQuestion(){
 function updateQuestionsNumbers() {
     let questionDivs = document.querySelectorAll(".question");
     questionDivs.forEach((q, index) => {
+        // Skip updating if the question has a fixed data-index
+        if (q.dataset.index) return;
+
         q.querySelector(".question-number").textContent = index + 1;
         q.querySelectorAll('[name*="questions"]').forEach(element => {
             element.name = element.name.replace(/questions\[\d+\]/, `questions[${index}]`);
@@ -67,6 +70,7 @@ function updateQuestionsNumbers() {
     });
     QuestionsCounter = questionDivs.length;
 }
+
 function deleteQuestion(question){
     question.remove();
     QuestionsCounter--;

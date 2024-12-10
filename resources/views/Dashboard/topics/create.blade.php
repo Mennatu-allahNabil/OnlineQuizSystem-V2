@@ -5,9 +5,9 @@
         @csrf
         <div class="mb-3">
             <label class="form-label">Name</label>
-            <input type="text" class="form-control" name="name" placeholder="Enter Topic Title " autofocus >
+            <input type="text" class="form-control" name="name" placeholder="Enter Topic Title " autofocus>
         </div>
-        <button type="submit" class="btn btn-primary mt-3 form-control">ADD</button>
+        <button type="submit" class="btn btn-primary mt-3 form-control">Add</button>
     </form>
 
 </x-dashboard>

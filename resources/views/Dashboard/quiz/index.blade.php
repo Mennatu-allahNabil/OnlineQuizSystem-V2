@@ -24,7 +24,7 @@
             </x-dropdown>
         </div>
 
-        <table class="table table-bordered">
+        <table class="table table-bordered bg-white">
             <thead>
                 <tr>
                     <th>Title</th>
@@ -42,18 +42,26 @@
                 <tr>
                     <td>{{ $quiz->title }}</td>
                     <td>{{ $quiz->description }}</td>
-                    <td>{{ $quiz->time_limit }} minutes</td>
+                    <td>
+                        @if($quiz->time_limit)
+                            {{ $quiz->time_limit }} minutes
+                        @else
+                            None
+                        @endif
+                    </td>
                     <td>{{ ucwords($quiz->topic->name) }}</td>
                     <td>{{ $quiz->creator["name"] }}</td>
                     <td>{{ ucwords(str_replace("_"," ",$quiz->quiz_type)) }}</td>
                     <td class="d-flex justify-content-evenly px-3 gap-3">
                         <a href="{{ route("quizzes.participants", $quiz->id) }}"> <i class="fa-solid fa-users"></i></a>
-                        @if(auth()->check() && auth()->user()->role == "super_admin" || auth()->user()->id == $quiz->created_by)
+                        @if(auth()->check() && (auth()->user()->role == "super_admin" || auth()->user()->id == $quiz->created_by))
                             <a href="{{ route('questions.index', $quiz->id) }}"><i class="fa-regular fa-eye"></i></a>
-                            <form action="{{ route('quiz.delete', $quiz->id) }}" method="POST" style="display:inline-block;">
+                            <form action="{{ route('quiz.delete', $quiz->id) }}" method="POST" style="display:inline-block;" id="deleteForm{{ $quiz->id }}">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit"><i class=" fa-regular fa-trash-can  text-danger "></i></button>
+                                <button type="button" onclick="confirmDelete({{ $quiz->id }})">
+                                    <i class="fa-regular fa-trash-can text-danger"></i>
+                                </button>
                             </form>
                         @else
                             <p class="text-secondary">No Action Can Be Took</p>
@@ -67,11 +75,40 @@
                             </button>
                         </form>
                     </td>
-                    
-                    
+
+
                 </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
+    @section("js_files")
+        <script>
+            function confirmDelete(quizId) {
+                // JavaScript confirmation dialog
+                if (confirm('Are you sure you want to delete this quiz?')) {
+                    // If user clicks "OK", submit the form
+                    document.getElementById('deleteForm' + quizId).submit();
+                }
+            }
+
+            // function confirmDelete(quizId) {
+            //     // SweetAlert2 confirmation dialog
+            //     Swal.fire({
+            //         title: 'Are you sure?',
+            //         text: 'This action cannot be undone!',
+            //         icon: 'warning',
+            //         showCancelButton: true,
+            //         confirmButtonColor: '#d33',
+            //         cancelButtonColor: '#3085d6',
+            //         confirmButtonText: 'Yes, delete it!'
+            //     }).then((result) => {
+            //         if (result.isConfirmed) {
+            //             // If user clicks "Yes", submit the form
+            //             document.getElementById('deleteForm' + quizId).submit();
+            //         }
+            //     });
+            // }
+        </script>
+    @endsection
 </x-dashboard>

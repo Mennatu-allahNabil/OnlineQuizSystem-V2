@@ -28,6 +28,7 @@
                     <th>No.</th>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Score(%)</th>
                     <th>Taken At</th>
                 </tr>
                 </thead>
@@ -36,10 +37,12 @@
                     $ParticipantsCounter=0;
                 @endphp
                 @foreach($participants as $participant)
+{{--                    {{$participant}}--}}
                     <tr>
                         <td>{{++$ParticipantsCounter}}</td>
                         <td>{{$participant->user->name}}</td>
                         <td>{{$participant->user->email}}</td>
+                        <td>{{$participant->score}}</td>
                         <td>{{$participant->created_at_edited}}</td>
                     </tr>
                 @endforeach
