@@ -1,8 +1,16 @@
 <x-dashboard>
-    @section('page_title', 'Edit Question')
+    @section('page_title', "Edit Question")
+
 
     <div class="container mt-5">
-
+        <div class="flex justify-between items-center mt-5">
+              <span>
+                <a href="{{route("questions.index",$quiz->id)}}" class="flex items-center text-blue-600 hover:text-blue-800 transition-colors">
+                  <i class="fas fa-arrow-left mr-2"></i>
+                  Go back to the quiz
+                </a>
+              </span>
+        </div>
         <form action="{{ route('questions.update', [$quiz->id, $question->id]) }}" method="POST" enctype="multipart/form-data" class="container-fluid d-flex flex-wrap  justify-content-between mt-5 bg-white p-5 rounded-2">
             @csrf
             @method('PUT')
@@ -62,4 +70,5 @@
             <button type="submit" class="btn btn-primary  mt-3 form-control">Update Question</button>
         </form>
     </div>
+
 </x-dashboard>

@@ -32,10 +32,10 @@ class QuizController extends Controller
     {
         if($id){
             $topic = Topic::findOrFail($id);
-            $quizzes = $topic->quizzes()->paginate(3);
+            $quizzes = $topic->quizzes()->paginate(6);
         }else{
             $topic = (object) ['name'=>'All'];
-            $quizzes = Quiz::paginate(3);
+            $quizzes = Quiz::paginate(6);
         }
         return view('website.quizzes.index', compact('topic', 'quizzes'));
 
@@ -57,7 +57,6 @@ return $months;
             $question->options = $question->options->shuffle();
         });
         $questions= $questions->shuffle();
-        // dd($questoins);
         return view('website.quizzes.show', compact('quiz','questions'));
     }
 
@@ -162,21 +161,10 @@ return $months;
             });
             alert::success("Success!","Quiz Added Successfully");
             return redirect()->route("quiz.index");
-//        } catch (ValidationException $e) {
-//            // Get the error messages
-//            $errorMessages = $e->validator->errors()->all();
-//            $errorCount = count($errorMessages);
-//            $errorMessage = "There are {$errorCount} issues with your input.";
-//
-//            // Display error message (using toast, assuming it's a function you have)
-//            toast($errorMessage, 'error');
-//
-//            // Redirect back to the previous page
-//            return redirect()->back()->withInput(); // Optionally retain the input
         } catch (\Exception $e) {
             // Handle any other exceptions
             toast($e->getMessage(), 'error');
-            return redirect()->back()->withInput();;
+            return redirect()->back()->withInput();
         }
     }
 
@@ -321,7 +309,7 @@ return $months;
     // here i show quiz and delete
     public function index()
     {
-        $quizzes = Quiz::with(['creator:id,name'])->get();
+        $quizzes = Quiz::with(['creator:id,email'])->get();
         return view('dashboard.quiz.index', compact('quizzes'));
     }
     public function show(Quiz $quiz)

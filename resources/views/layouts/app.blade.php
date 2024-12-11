@@ -18,7 +18,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        
+
         <!-- Bootstrap CSS -->
         <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
 
@@ -30,16 +30,56 @@
 
         <!-- sweetalert2 -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- trends --> 
+<!-- trends -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
         @livewireStyles
-       
-       
-        
+<style>
+    .custom-pattern {
+        /*background:*/
+        /*    conic-gradient(at 50% calc(100%/6),#1A8FE5 60deg,#0000 0),*/
+        /*    conic-gradient(at calc(100%/6) 50%,#0000 240deg,#1A8FE5 0),*/
+        /*    conic-gradient(from 180deg at calc(100%/6) calc(500%/6),#1A8FE5 60deg,#0000 0),*/
+        /*    conic-gradient(from 180deg at calc(500%/6),#0000 240deg,#1A8FE5 0) calc(4*.866*16px) 0,*/
+        /*    repeating-linear-gradient(-150deg,#1AE5D6 0 calc(100%/6),#0000   0 50%),*/
+        /*    repeating-linear-gradient(-30deg, #fff 0 calc(100%/6),#E4E4ED 0 50%);*/
+        /*background-size: calc(6*.866*16px) calc(3*16px);*/
+    }
+
+     html{
+         scroll-behavior: smooth;
+     }
+    .go-up-down{
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        width: 2em;
+        gap: 0.25rem;
+        position: fixed;
+        bottom: 1em;
+        right: 1em;
+        z-index: 1000;
+    }
+    #go-up,
+    #go-down{
+        margin-block: 0.25em;
+        width: 1.75em;
+        height: 1.75em;
+        color: white;
+        background-color: #0a58ca;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 2;
+    }
+</style>
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased custom-pattern">
+
+    <div class="go-up-down">
+        <button type="button" id="go-up"><i class="fas fa-chevron-up"></i></button>
+        <button type="button" id="go-down"><i class="fas fa-chevron-down"></i></button>
+    </div>
         @include('sweetalert::alert')
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
             @include('layouts.navigation')
@@ -58,8 +98,23 @@
                 {{ $slot }}
             </main>
         </div>
-        
+
         @livewireScripts
     </body>
-    <x-footer />
+    <x-footer/>
+    <script>
+        let go_up=document.getElementById("go-up");
+        let go_down=document.getElementById("go-down");
+        go_up.addEventListener("click",()=>{
+            window.scrollTo({
+                top: 0,
+            });
+        });
+        go_down.addEventListener("click",()=>{
+            window.scrollTo({
+                top: document.documentElement.scrollHeight,
+            });
+        });
+    </script>
 </html>
+

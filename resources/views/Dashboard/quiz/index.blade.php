@@ -23,7 +23,19 @@
                 </x-slot>
             </x-dropdown>
         </div>
-
+        @if (session('success'))
+            <div class="alert alert-success" id="alert-del">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if ($quizzes->count()==0)
+            <div class="alert alert-warning mt-5 text-center" role="alert">
+                No Quizzes !
+            </div>
+            <form action="{{route('admin.CreateQuiz')}}" method="GET">
+                <button type="submit" class="btn btn-primary mt-3 form-control">Create Quiz</button>
+            </form>
+        @else
         <table class="table table-bordered bg-white">
             <thead>
                 <tr>
@@ -50,7 +62,7 @@
                         @endif
                     </td>
                     <td>{{ ucwords($quiz->topic->name) }}</td>
-                    <td>{{ $quiz->creator["name"] }}</td>
+                    <td>{{ $quiz->creator["email"] }}</td>
                     <td>{{ ucwords(str_replace("_"," ",$quiz->quiz_type)) }}</td>
                     <td class="d-flex justify-content-evenly px-3 gap-3">
                         <a href="{{ route("quizzes.participants", $quiz->id) }}"> <i class="fa-solid fa-users"></i></a>
@@ -59,7 +71,7 @@
                             <form action="{{ route('quiz.delete', $quiz->id) }}" method="POST" style="display:inline-block;" id="deleteForm{{ $quiz->id }}">
                                 @csrf
                                 @method('DELETE')
-                                <button type="button" onclick="confirmDelete({{ $quiz->id }})">
+                                <button type="submit" onclick="confirmDelete({{ $quiz->id }})" class="delete-btn">
                                     <i class="fa-regular fa-trash-can text-danger"></i>
                                 </button>
                             </form>
@@ -81,34 +93,80 @@
                 @endforeach
             </tbody>
         </table>
+        @endif
+
     </div>
     @section("js_files")
-        <script>
-            function confirmDelete(quizId) {
-                // JavaScript confirmation dialog
-                if (confirm('Are you sure you want to delete this quiz?')) {
-                    // If user clicks "OK", submit the form
-                    document.getElementById('deleteForm' + quizId).submit();
-                }
-            }
+{{--        <script>--}}
+{{--            // function confirmDelete(quizId) {--}}
+{{--            //     // JavaScript confirmation dialog--}}
+{{--            //     if (confirm('Are you sure you want to delete this quiz?')) {--}}
+{{--            //         // If user clicks "OK", submit the form--}}
+{{--            //         document.getElementById('deleteForm' + quizId).submit();--}}
+{{--            //     }--}}
+{{--            // }--}}
+{{--        </script>--}}
 
-            // function confirmDelete(quizId) {
-            //     // SweetAlert2 confirmation dialog
-            //     Swal.fire({
-            //         title: 'Are you sure?',
-            //         text: 'This action cannot be undone!',
-            //         icon: 'warning',
-            //         showCancelButton: true,
-            //         confirmButtonColor: '#d33',
-            //         cancelButtonColor: '#3085d6',
-            //         confirmButtonText: 'Yes, delete it!'
-            //     }).then((result) => {
-            //         if (result.isConfirmed) {
-            //             // If user clicks "Yes", submit the form
-            //             document.getElementById('deleteForm' + quizId).submit();
-            //         }
-            //     });
-            // }
+
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Select all delete forms
+                const deleteForms = document.querySelectorAll('form[id^="deleteForm"]');
+
+                // Attach click events to each delete button
+                deleteForms.forEach((deleteForm) => {
+                    const deleteBtn = deleteForm.querySelector('.delete-btn');
+
+                    deleteBtn.addEventListener('click', function(e) {
+                        e.preventDefault(); // Prevent immediate form submission
+
+                        // Create confirmation dialog
+                        const confirmDialog = document.createElement('div');
+                        confirmDialog.innerHTML = `
+                <div class="modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:1000;">
+                    <div class="modal-content d-flex justify-center align-items-center gap-2 p-5" style="background:white; border-radius:5px; text-align:center;margin: auto;width: 25%;height: 25%">
+                        <p class="fs-5">Are you sure you want to delete this quiz?</p>
+                        <p class="fs-6">Click "Delete" to confirm</p>
+                        <div>
+                            <button class="confirm-delete btn-danger btn" style="margin:0 10px; padding:10px 20px; background-color:red; color:white; border:none; border-radius:3px;">Delete</button>
+                            <button class="cancel-delete btn-primary btn" style="margin:0 10px; padding:10px 20px; color:white; border:none; border-radius:3px;">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+                        // Add the confirmation dialog to the document body
+                        document.body.appendChild(confirmDialog);
+
+                        // Confirm delete button
+                        const confirmDeleteBtn = confirmDialog.querySelector('.confirm-delete');
+                        confirmDeleteBtn.addEventListener('click', function() {
+                            deleteForm.submit(); // Submit the associated delete form
+                        });
+
+                        // Cancel delete button
+                        const cancelDeleteBtn = confirmDialog.querySelector('.cancel-delete');
+                        cancelDeleteBtn.addEventListener('click', function() {
+                            document.body.removeChild(confirmDialog); // Remove the modal from the DOM
+                        });
+                    });
+                });
+            });
+
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const alert = document.getElementById('alert-del');
+                if (alert) {
+                    // Set timeout to hide the alert after 5 seconds (5000 ms)
+                    setTimeout(() => {
+                        alert.style.transition = 'opacity 0.5s';
+                        alert.style.opacity = '0';
+                        setTimeout(() => alert.remove(), 1000); // Remove the element after fade-out
+                    }, 10000);
+                }
+            });
         </script>
     @endsection
 </x-dashboard>

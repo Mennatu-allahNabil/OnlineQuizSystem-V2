@@ -43,12 +43,12 @@ return [
             'visibility' => 'public',
             'throw' => false,
         ],
-        
+
         'public_folder' => [
             'driver' => 'local',
             'root' => public_path('upload_images'),
             'url' => env('APP_URL') . '/public',
-            'visibility' => 'public',
+            'visibility' => 'private',
             'throw' => false,
         ],
 

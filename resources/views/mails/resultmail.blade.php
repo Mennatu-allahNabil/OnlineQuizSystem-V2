@@ -19,16 +19,16 @@
             border: 1px solid #ddd;
             padding: 8px;
         }
-        
+
 
         .bg-success {
-            background-color: #28a745 !important;
-            color: white;
+            color: #28a745 !important;
+            /*color: white;*/
         }
 
         .bg-danger {
-            background-color: #dc3545 !important;
-            color: white;
+            color: #dc3545 !important;
+            /*color: white;*/
         }
 
         .text-muted {

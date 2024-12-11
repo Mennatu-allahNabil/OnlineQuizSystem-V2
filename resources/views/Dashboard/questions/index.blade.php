@@ -81,6 +81,11 @@
 
     <div class="container mt-5">
         <h2>Questions List</h2>
+        @if ($quiz->questions->count()==0)
+            <div class="alert alert-warning mt-5 text-center" role="alert">
+                No Questions !
+            </div>
+        @else
         <table class="table table-bordered">
             @php
                 $NumberOfQuestions=0
@@ -106,11 +111,13 @@
                             @if(auth()->check() && auth()->user()->role=="super_admin"||auth()->user()->id==$quiz->created_by)
 
                             <a href="{{ route('questions.edit', [$quiz->id, $question->id]) }}"><i class="fa-regular fa-pen-to-square"></i></a>
-                            <form action="{{ route('questions.destroy', [$quiz->id, $question->id]) }}" method="POST" style="display:inline-block;" class="delete-form">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"><i class=" fa-regular fa-trash-can  text-danger "></i></button>
-                            </form>
+                                <form id="deleteForm" action="{{ route('questions.destroy', [$quiz->id, $question->id]) }}" method="POST" style="display:inline-block;" class="delete-form">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="delete-btn">
+                                        <i class="fa-regular fa-trash-can text-danger"></i>
+                                    </button>
+                                </form>
                             @else
                                 <p class="text-secondary">No Action Can Be Took</p>
                             @endif
@@ -119,20 +126,62 @@
                 @endforeach
             </tbody>
         </table>
+        @endif
     </div>
 @include("layouts.questions")
-    @include('sweetalert::alert')
-    @if(session('success'))
+
+@section("js_files")
+        <script src="{{asset("assets/js/add_questions.js")}}"></script>
+
+            <script>
+                function confirmDelete(quizId) {
+                    // JavaScript confirmation dialog
+                    if (confirm('Are you sure you want to delete this quiz?')) {
+                        // If user clicks "OK", submit the form
+                        document.getElementById('deleteForm' + quizId).submit();
+                    }
+                }
+            </script>
         <script>
-            Swal.fire({
-                title: 'Deleted!',
-                text: "{{ session('success') }}",
-                icon: 'success',
-                confirmButtonText: 'OK'
+            document.addEventListener('DOMContentLoaded', function() {
+                const deleteForm = document.querySelector('.delete-form');
+                const deleteBtn = deleteForm.querySelector('.delete-btn');
+
+                deleteBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    // Create confirmation dialog
+                    const confirmDialog = document.createElement('div');
+                    confirmDialog.innerHTML = `
+            <div class="modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:1000;">
+                <div class="modal-content d-flex justify-center align-items-center gap-2 p-5" style="background:white; border-radius:5px; text-align:center;margin: auto;width: 25%;height: 25%">
+                    <p class="fs-5">Are you sure you want to delete this question?</p>
+                    <p class="fs-6">Click "Delete" to confirm</p>
+
+                    <div>
+                        <button class="confirm-delete btn-danger btn" style="margin:0 10px; padding:10px 20px; background-color:red; color:white; border:none; border-radius:3px;">Delete</button>
+                        <button class="cancel-delete btn-primary btn" style="margin:0 10px; padding:10px 20px; color:white; border:none; border-radius:3px;">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+                    // Add to body
+                    document.body.appendChild(confirmDialog);
+
+                    // Confirm delete button
+                    const confirmDeleteBtn = confirmDialog.querySelector('.confirm-delete');
+                    confirmDeleteBtn.addEventListener('click', function() {
+                        deleteForm.submit();
+                    });
+
+                    // Cancel delete button
+                    const cancelDeleteBtn = confirmDialog.querySelector('.cancel-delete');
+                    cancelDeleteBtn.addEventListener('click', function() {
+                        document.body.removeChild(confirmDialog);
+                    });
+                });
             });
         </script>
-    @endif
-    @section("js_files")
-        <script src="{{asset("assets/js/add_questions.js")}}"></script>
-    @endsection
+@endsection
 </x-dashboard>

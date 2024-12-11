@@ -1,10 +1,15 @@
 <x-dashboard>
   @section('page_title', 'Topics')
   <div class=" w-75 container text-center mt-5">
+      @if ($topics->count()==0)
+          <div class="alert alert-warning mt-5" role="alert">
+              No Topics !
+          </div>
+      @else
     <table class="table">
       <thead>
         <tr>
-          <th scope="col">#</th>
+          <th scope="col">No.</th>
           <th scope=" col ">Title</th>
           <th scope=" col "></th>
           <th scope=" col "></th>
@@ -43,14 +48,12 @@
 
       </tbody>
     </table>
+
+      @endif
     <form action="{{route('topics.create')}}" method="GET">
       <button type="submit" class="btn btn-primary mt-3 form-control">Add</button>
     </form>
-    @if ($topics->count()==0)
-    <div class="alert alert-warning mt-5" role="alert">
-      No Topics !
-    </div>
-    @endif
+
   </div>
     @section("js_files")
         <script>
