@@ -1,6 +1,23 @@
 <x-dashboard>
     @section('page_title', 'Manage Quizzes')
+@section("css_files")
+        <style>
+            /*.resize-handle {*/
+            /*    cursor: col-resize;*/
+            /*    width: 5px;*/
+            /*    height: 100%;*/
+            /*    position: absolute;*/
+            /*    right: 0;*/
+            /*    top: 0;*/
+            /*    background: #ccc;*/
+            /*}*/
 
+            th {
+                position: relative;
+            }
+
+        </style>
+    @endsection
     <div class="container mt-5">
 
         <div class="d-flex justify-content-between">
@@ -39,14 +56,14 @@
         <table class="table table-bordered bg-white">
             <thead>
                 <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Time Limit</th>
-                    <th>Topic</th>
-                    <th>Created By</th>
-                    <th>Quiz Type</th>
-                    <th>Actions</th>
-                    <th>Download PDF</th> <!-- New Column for PDF -->
+                    <th>Title <div class="resize-handle"></div></th>
+                    <th>Description <div class="resize-handle"></div></th>
+                    <th>Time Limit <div class="resize-handle"></div></th>
+                    <th>Topic <div class="resize-handle"></div></th>
+                    <th>Created By <div class="resize-handle"></div></th>
+                    <th>Quiz Type <div class="resize-handle"></div></th>
+                    <th>Actions <div class="resize-handle"></div></th>
+                    <th>PDF <div class="resize-handle"></div></th> <!-- New Column for PDF -->
                 </tr>
             </thead>
             <tbody>
@@ -165,6 +182,35 @@
                         alert.style.opacity = '0';
                         setTimeout(() => alert.remove(), 1000); // Remove the element after fade-out
                     }, 10000);
+                }
+            });
+        </script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const table = document.querySelector("table");
+                let startX, startWidth, resizableTh;
+
+                table.addEventListener("mousedown", (e) => {
+                    if (e.target.classList.contains("resize-handle")) {
+                        resizableTh = e.target.closest("th");
+                        startX = e.pageX;
+                        startWidth = resizableTh.offsetWidth;
+                        document.addEventListener("mousemove", resizeColumn);
+                        document.addEventListener("mouseup", stopResize);
+                    }
+                });
+
+                function resizeColumn(e) {
+                    if (resizableTh) {
+                        const newWidth = startWidth + (e.pageX - startX);
+                        resizableTh.style.width = newWidth + "px";
+                    }
+                }
+
+                function stopResize() {
+                    document.removeEventListener("mousemove", resizeColumn);
+                    document.removeEventListener("mouseup", stopResize);
                 }
             });
         </script>

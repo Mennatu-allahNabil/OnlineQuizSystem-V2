@@ -57,7 +57,19 @@ return $months;
             $question->options = $question->options->shuffle();
         });
         $questions= $questions->shuffle();
+
+//        // Get all questions for the quiz and shuffle them
+//        $questions = Question::where('quiz_id', $quiz->id)
+//            ->with('options') // Eager load options
+//            ->get()
+//            ->shuffle();  // Shuffle questions
+//
+//        // Shuffle options for each question
+//        foreach ($questions as $question) {
+//            $question->options = $question->options->shuffle();
+//        }
         return view('website.quizzes.show', compact('quiz','questions'));
+
     }
 
     public function addQuestions(array $QuestionsData, Quiz $quiz,Request $request=null)
@@ -174,7 +186,7 @@ return $months;
         $userId = auth()->id();
         $quizId = $request->input('quiz_id');
         $score = 0;
-        $totalQuestions = 0;
+//        $totalQuestions = 0;
 
 
 
@@ -243,7 +255,7 @@ return $months;
 
     public function showResults(Request $request)
     {
-
+//    dd($request);
         $userId = auth()->id();
 
 
@@ -261,12 +273,67 @@ return $months;
             ->where('performance_histories.user_id', $userId)
             ->get();
 
+        $latestAttempt = PerformanceHistory::where('user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->first();
+        $quiz_id=$latestAttempt->quiz_id;
+        $quiz_type=Quiz::select("quiz_type")->where("id",$quiz_id)->first();
+        $user_id=$latestAttempt->user_id;
+        $userAnswers = Answer::where('user_id', $user_id) // replace 8 with auth()->id() for dynamic user
+            ->where('quiz_id', $quiz_id) // replace 41 with the quiz ID
+            ->where('created_at', $latestAttempt->created_at)
+            ->get();
+
+//        dd($userAnswers);
+//        dd($quiz_type);
+        $questionsWithOptions = [];
+
+//        foreach ($userAnswers as $userAnswer) {
+            // Fetch the question for this answer
+            $questions = Question::where('quiz_id', $quiz_id)->get();
+
+            foreach ($questions as $question) {
+                // Find the user's answer for this question
+                $userAnswer = $userAnswers->where('question_id', $question->id)->first();
+
+                // Fetch all options for this question
+                $options = $question->options; // Assuming the options relationship is defined on the Question model
+
+                // Find the selected option based on the user answer, if it exists
+                $selectedOption = $userAnswer
+                    ? $options->where('id', $userAnswer->option_id)->first()
+                    : null;
+
+                // Store the question with its options and user answer details
+                $questionsWithOptions[] = [
+                    'question_id' => $question->id,
+                    'question_text' => $question->question_text,
+                    'selected_option' => $selectedOption
+                        ? [
+                            'option_id' => $selectedOption->id,
+                            'option_text' => $selectedOption->option_text,
+                            'is_correct' => $selectedOption->is_correct // Check if the selected option is correct
+                        ]
+                        : null,
+                    'options' => $options->map(function ($option) {
+                        return [
+                            'option_id' => $option->id,
+                            'option_text' => $option->option_text,
+                            'is_correct' => $option->is_correct
+                        ];
+                    })
+                ];
+            }
+//        }
+
+// Example output to check the result
+//        dd($questionsWithOptions);
 
         $score = $request->input('score');
         $total = $request->input('total');
         $percentage = $request->input('percentage');
 
-        return view('quiz.results', compact('score', 'total', 'percentage', 'userResults'));
+        return view('quiz.results', compact('score', 'total', 'percentage', 'userResults',"quiz_type","questionsWithOptions"));
     }
 
 
@@ -427,13 +494,20 @@ return $months;
     $quiz = Quiz::findOrFail($quizId);
 
     // Fetch the results: User name and score for the quiz
-    $results = PerformanceHistory::select('performance_histories.user_id', 'users.name', 'performance_histories.score')
+    $results = PerformanceHistory::select('performance_histories.user_id', 'users.email', 'performance_histories.score',"performance_histories.created_at")
         ->join('users', 'performance_histories.user_id', '=', 'users.id')
         ->where('performance_histories.quiz_id', $quizId) // Filter by the quiz ID
         ->get();
+    $results = $results->map(function ($result) {
+        $result->created_at_formatted = Carbon::parse($result->created_at)->format('M j, Y \a\t H:i');
+        return $result;
+    });
+
+    $passPercentage = PerformanceHistory::where('quiz_id', $quizId)->where('score', '>=', 50)->count() / (PerformanceHistory::count() ?: 1) * 100; // تجنب القسمة على صفر
 
     // Prepare data for the PDF
     $data = [
+        "passPercent"=>$passPercentage,
         'quizTitle' => $quiz->title,
         'results' => $results, // Passing the results to the view
     ];

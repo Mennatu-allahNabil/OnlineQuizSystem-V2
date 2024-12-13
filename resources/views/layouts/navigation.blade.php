@@ -15,19 +15,19 @@
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-nav-link  :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Home') }}
-                    </x-nav-link>  
+                    </x-nav-link>
                     {{-- <x-nav-link  :href="'#about-us'" :active="request()->routeIs('dashboard')">
                         {{ __('About Us') }}
                     </x-nav-link>                --}}
-                
+
                 <!-- Topics Dropdown -->
-                
+
                     <div class="dropdown">
 
                         <x-nav-link  class="dropdown-toggle" :href="route('dashboard')" :active="request()->routeIs('quizzes.by_topic')"  role="button" id="topicsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             {{ __('Topics') }}
                         </x-nav-link>
-                        
+
                         <!-- Dropdown Menu -->
                         <ul class="dropdown-menu" aria-labelledby="topicsDropdown">
                             <li>
@@ -38,7 +38,7 @@
                             @foreach($topics as $topic)
                                 <li>
                                     <a class="dropdown-item" href="{{ route('quizzes.by_topic', $topic->id) }}">
-                                        {{ $topic->name }}
+                                        {{ ucwords($topic->name) }}
                                     </a>
                                 </li>
                             @endforeach
@@ -103,7 +103,7 @@
                             <a href="{{ route('register') }}" class=" text-decoration-none btn-custom btn-register">Register</a>
                         </div>
                     </div>
-                    
+
                 @endauth
             </div>
 
@@ -132,7 +132,7 @@
             <x-responsive-nav-link  class="dropdown-toggle" :href="route('dashboard')" :active="request()->routeIs('quizzes.by_topic')"  role="button" id="topicsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 {{ __('Topics') }}
             </x-responsive-nav-link>
-            
+
             <!-- Dropdown Menu -->
             <ul class="dropdown-menu" aria-labelledby="topicsDropdown">
                 <li>
@@ -151,7 +151,7 @@
         </div>
 
         <!-- Responsive Settings Options -->
-       
+
             <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
                 @auth
                 <div class="px-4">
@@ -189,6 +189,6 @@
                 </div>
                 @endguest
             </div>
-       
+
     </div>
 </nav>

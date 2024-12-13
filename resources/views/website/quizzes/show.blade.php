@@ -2,19 +2,31 @@
     <div class="container mt-5">
         <h1 class="text-center mb-4">{{ $quiz->title }}</h1>
 
-
-   @if ($quiz->time_limit)
-     <div class="sticky-lg-top">
-         <livewire:counter-component :quizId="$quiz->id" />
-     </div>
-   @endif
+        @if ($quiz->time_limit)
+            <div class="sticky-lg-top">
+                <livewire:counter-component :quizId="$quiz->id" />
+            </div>
+        @endif
 
         <form action="{{ route('quiz.submit') }}" method="POST" id="quizForm">
             <input type="hidden" name="quiz_id" value="{{ $quiz->id }}">
             @csrf
 
             <div id="question-container" class="position-relative">
-                <!-- Questions will be dynamically rendered here -->
+                @foreach ($questions as $index => $question)
+                    <div class="mb-4">
+                        <p class="font-weight-bold">{{ $index + 1 }}. {{ $question->question_text }}</p>
+
+                        @foreach ($question->options as $optionIndex => $option)
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="question_{{ $question->id }}" id="option_{{ $option->id }}" value="{{ $option->id }}">
+                                <label class="form-check-label" for="option_{{ $option->id }}">
+                                    {{ $optionIndex + 1 }}. {{ $option->option_text }} <!-- Numbering options -->
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                @endforeach
             </div>
 
             <!-- Pagination Buttons -->
@@ -37,8 +49,27 @@
     const questions = @json($questions);
     const questionsPerPage = 3;
     let currentPage = 1;
-    let userAnswers = {};
 
+    // Function to store selected answers in localStorage
+    function storeAnswer(questionId, selectedOptionId) {
+        let answers = JSON.parse(localStorage.getItem('quizAnswers')) || {};
+        answers[questionId] = selectedOptionId;
+        localStorage.setItem('quizAnswers', JSON.stringify(answers));
+    }
+
+    // Function to retrieve answers from localStorage and preselect the options
+    function loadAnswers() {
+        const answers = JSON.parse(localStorage.getItem('quizAnswers')) || {};
+        Object.keys(answers).forEach(questionId => {
+            const selectedOptionId = answers[questionId];
+            const radio = document.querySelector(`input[name="question_${questionId}"][value="${selectedOptionId}"]`);
+            if (radio) {
+                radio.checked = true;
+            }
+        });
+    }
+
+    // Function to render the questions
     function renderQuestions() {
         const start = (currentPage - 1) * questionsPerPage;
         const end = start + questionsPerPage;
@@ -48,7 +79,7 @@
         const questionContainer = document.getElementById("question-container");
         questionContainer.innerHTML = '';  // Clear existing questions
 
-        currentQuestions.forEach(question => {
+        currentQuestions.forEach((question, questionIndex) => {
             const questionElement = document.createElement('div');
             questionElement.classList.add('col-md-12', 'mb-4');
             questionElement.innerHTML = `
@@ -57,14 +88,12 @@
                         ${question.image ? `<div class="mb-3" style="height: 15em;aspect-ratio:3/2;">
                                                 <img src="{{ asset('upload_images/${question.image}') }}" class="img-fluid mt-3 h-100" alt="Question Image">
                                             </div>` : ''}
-                        <p class="card-text font-weight-bold">${question.question_text}</p>
-                        ${question.options.map(option => `
+                        <p class="card-text font-weight-bold">${start + questionIndex + 1}. ${question.question_text}</p>
+                        ${question.options.map((option, optionIndex) => `
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="question_${question.id}" id="option_${option.id}" value="${option.id}"
-                                    ${userAnswers[question.id] === option.id ? 'checked' : ''}
-                                    onchange="saveAnswer(${question.id}, ${option.id})">
+                                <input class="form-check-input" type="radio" name="question_${question.id}" id="option_${option.id}" value="${option.id}">
                                 <label class="form-check-label" for="option_${option.id}">
-                                    ${option.option_text}
+                                    ${optionIndex + 1}. ${option.option_text} <!-- Numbering options -->
                                 </label>
                             </div>
                         `).join('')}
@@ -83,6 +112,9 @@
         nextBtn.disabled = currentPage === totalPages;
 
         pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
+
+        // Load answers from localStorage and preselect the options
+        loadAnswers();
     }
 
     function goToPage(page) {
@@ -93,40 +125,44 @@
         renderQuestions();
     }
 
-    function saveAnswer(questionId, optionId) {
-        userAnswers[questionId] = optionId;
-    }
+    // Add event listener to store the answer when a user selects an option
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', (event) => {
+            const questionId = event.target.name.split('_')[1];
+            const selectedOptionId = event.target.value;
+            storeAnswer(questionId, selectedOptionId);
+        });
+    });
 
     document.getElementById('quizForm').addEventListener('submit', (event) => {
         event.preventDefault();
 
-        // Create hidden input fields for each answer
-        Object.entries(userAnswers).forEach(([questionId, optionId]) => {
-            const hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = `question_${questionId}`;
-            hiddenInput.value = optionId;
-            event.target.appendChild(hiddenInput);
-        });
-
         // Submit the form
         event.target.submit();
+        localStorage.removeItem('quizAnswers');
     });
+    window.addEventListener('beforeunload', () => {
+        localStorage.removeItem('quizAnswers');
+    });
+    window.addEventListener('popstate', () => {
+        localStorage.removeItem('quizAnswers');
+    });
+    const originalPushState = history.pushState;
+    history.pushState = function(...args) {
+        originalPushState.apply(this, args);
+        localStorage.removeItem('quizAnswers');
+    };
 
-
+    const originalReplaceState = history.replaceState;
+    history.replaceState = function(...args) {
+        originalReplaceState.apply(this, args);
+        localStorage.removeItem('quizAnswers');
+    };
+    document.addEventListener('DOMContentLoaded', () => {
+        // if (window.location.href.includes('quiz.submit')) {
+            localStorage.removeItem('quizAnswers');
+        // }
+    });
     // Initial render
     renderQuestions();
-
 </script>
-
-<style>
-    /* Remove previous bottom margin styling */
-    #question-container {
-        min-height: 300px; /* Ensure consistent height */
-    }
-
-    .pagination-container {
-        position: relative;
-        z-index: 10;
-    }
-</style>

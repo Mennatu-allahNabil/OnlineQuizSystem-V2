@@ -71,9 +71,9 @@
                     @foreach($question->options as $option)
                     <p class="
                         @if($option->is_correct)
-                            bg-success
+                            text-success
                         @elseif($selectedAnswer && $selectedAnswer->option_id == $option->id)
-                            bg-danger
+                            text-danger
                         @else
                             text-muted
                         @endif

@@ -109,6 +109,7 @@ class ProfileController extends Controller
             'performance_histories.user_id',
             'users.name',
             'quizzes.title',
+            'quizzes.quiz_type',
             'performance_histories.score',
             'performance_histories.attempt_number',
 

@@ -130,7 +130,7 @@ Route::get('/quiz/results', [QuizController::class, 'showResults'])->name('quiz.
 
 
 
-
+// verification
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');

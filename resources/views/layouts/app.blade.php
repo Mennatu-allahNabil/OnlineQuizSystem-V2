@@ -74,7 +74,7 @@
     }
 </style>
     </head>
-    <body class="font-sans antialiased custom-pattern">
+    <body class="font-sans antialiased custom-pattern  bg-gray-100">
 
     <div class="go-up-down">
         <button type="button" id="go-up"><i class="fas fa-chevron-up"></i></button>
