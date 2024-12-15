@@ -1,6 +1,14 @@
 <x-dashboard>
     @section('page_title', 'Participants For : '.$quiz->title)
     <div class="container mt-5">
+        <div class="flex justify-between items-center mt-5 mb-3 fw-medium fs-6">
+              <span>
+                <a href="{{route("quiz.index")}}" class="flex items-center text-blue-600 hover:text-blue-800 transition-colors">
+                  <i class="fas fa-arrow-left mr-2"></i>
+                  Go back to the quizzes list
+                </a>
+              </span>
+        </div>
         <div class="d-flex justify-content-between">
             <h2>Participants List</h2>
             <x-dropdown align="right" width="48">

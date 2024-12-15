@@ -20,7 +20,8 @@
             <i class="fas fa-arrow-right move-icon"></i>
         </button></a>
 </div>
-    <div class="container mt-5 bg-white p-5 mb-5 rounded">
+    @if($quiz_type=="once_attempt")
+        <div class="container mt-5 bg-white p-5 mb-5 rounded">
             @foreach($questionsWithOptions as $index => $question)
                 <div class="mb-6 border-b pb-4">
                     <h2 class="fs-5 font-semibold mb-3">
@@ -61,7 +62,8 @@
                     </div>
                 </div>
             @endforeach
-    </div>
+        </div>
+    @endif
     <script>
 
     </script>

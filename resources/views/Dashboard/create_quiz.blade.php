@@ -36,7 +36,7 @@
             <select type="text" class="form-control" name="topic_id">
                 @if(count($topics))
                     @foreach($topics as $topic)
-                        <option value="{{$topic["id"]}}" class="topic" {{ old('topic_id') == $topic['id'] ? 'selected' : '' }}>{{$topic["name"]}}</option>
+                        <option value="{{$topic["id"]}}" class="topic" {{ old('topic_id') == $topic['id'] ? 'selected' : '' }}>{{ucwords($topic["name"])}}</option>
                     @endforeach
                 @endif
 

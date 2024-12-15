@@ -34,7 +34,7 @@
                     </x-dropdown-link>
                     @foreach($topics as $topic)
                         <x-dropdown-link  href="{{ route('quizzes.by_topic.admin', $topic->id) }}">
-                            {{ $topic->name }}
+                            {{ucwords($topic->name) }}
                         </x-dropdown-link>
                     @endforeach
                 </x-slot>

@@ -144,42 +144,48 @@
             </script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                const deleteForm = document.querySelector('.delete-form');
-                const deleteBtn = deleteForm.querySelector('.delete-btn');
+                // Use event delegation to handle delete button clicks
+                document.addEventListener('click', function(e) {
+                    // Check if the clicked element is a delete button
+                    const deleteBtn = e.target.closest('.delete-btn');
+                    if (deleteBtn) {
+                        e.preventDefault();
 
-                deleteBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
+                        // Find the parent form of the clicked delete button
+                        const deleteForm = deleteBtn.closest('.delete-form');
 
-                    // Create confirmation dialog
-                    const confirmDialog = document.createElement('div');
-                    confirmDialog.innerHTML = `
-            <div class="modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:1000;">
-                <div class="modal-content d-flex justify-center align-items-center gap-2 p-5" style="background:white; border-radius:5px; text-align:center;margin: auto;width: 25%;height: 25%">
-                    <p class="fs-5">Are you sure you want to delete this question?</p>
-                    <p class="fs-6">Click "Delete" to confirm</p>
-
-                    <div>
-                        <button class="confirm-delete btn-danger btn" style="margin:0 10px; padding:10px 20px; background-color:red; color:white; border:none; border-radius:3px;">Delete</button>
-                        <button class="cancel-delete btn-primary btn" style="margin:0 10px; padding:10px 20px; color:white; border:none; border-radius:3px;">Cancel</button>
+                        // Create confirmation dialog
+                        const confirmDialog = document.createElement('div');
+                        confirmDialog.innerHTML = `
+                <div class="modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:1000;">
+                    <div class="modal-content d-flex flex-column justify-center align-items-center gap-3 p-5" style="background:white; border-radius:5px; text-align:center; margin:auto; width:25%; min-height:25%">
+                        <p class="fs-5">Are you sure you want to delete this question?</p>
+                        <p class="fs-6 text-muted">Click "Delete" to confirm</p>
+                        <div>
+                            <button class="confirm-delete btn btn-danger" style="margin:0 10px; padding:10px 20px;">Delete</button>
+                            <button class="cancel-delete btn btn-primary" style="margin:0 10px; padding:10px 20px;">Cancel</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
+            `;
 
-                    // Add to body
-                    document.body.appendChild(confirmDialog);
+                        // Add to body
+                        document.body.appendChild(confirmDialog);
 
-                    // Confirm delete button
-                    const confirmDeleteBtn = confirmDialog.querySelector('.confirm-delete');
-                    confirmDeleteBtn.addEventListener('click', function() {
-                        deleteForm.submit();
-                    });
+                        // Confirm delete button
+                        const confirmDeleteBtn = confirmDialog.querySelector('.confirm-delete');
+                        confirmDeleteBtn.addEventListener('click', function() {
+                            // Submit the associated form
+                            deleteForm.submit();
+                        });
 
-                    // Cancel delete button
-                    const cancelDeleteBtn = confirmDialog.querySelector('.cancel-delete');
-                    cancelDeleteBtn.addEventListener('click', function() {
-                        document.body.removeChild(confirmDialog);
-                    });
+                        // Cancel delete button
+                        const cancelDeleteBtn = confirmDialog.querySelector('.cancel-delete');
+                        cancelDeleteBtn.addEventListener('click', function() {
+                            // Remove the confirmation dialog
+                            document.body.removeChild(confirmDialog);
+                        });
+                    }
                 });
             });
         </script>

@@ -30,15 +30,14 @@ class QuizController extends Controller
     use Uploadimage, CheckFile;
     public function showQuizzesByTopic($id)
     {
-        if($id){
+        if ($id) {
             $topic = Topic::findOrFail($id);
-            $quizzes = $topic->quizzes()->paginate(6);
-        }else{
-            $topic = (object) ['name'=>'All'];
-            $quizzes = Quiz::paginate(6);
+            $quizzes = $topic->quizzes()->has('questions')->paginate(6);
+        } else {
+            $topic = (object) ['name' => 'All'];
+            $quizzes = Quiz::has('questions')->paginate(6);
         }
         return view('website.quizzes.index', compact('topic', 'quizzes'));
-
     }
 
     public function getMonths()
@@ -182,35 +181,26 @@ return $months;
 
     public function submitQuiz(Request $request)
     {
-        $submittedAnswers = $request->except('_token');
+        $submittedAnswers = $request->input('answers', []);
         $userId = auth()->id();
         $quizId = $request->input('quiz_id');
         $score = 0;
-//        $totalQuestions = 0;
-
-
 
         $questions = Question::where('quiz_id', $quizId)->get();
         $totalQuestions = $questions->count();
 
-        foreach ($submittedAnswers as $questionKey => $selectedOptionId) {
-            $questionId = str_replace('question_', '', $questionKey);
-
-
+        foreach ($submittedAnswers as $questionId => $selectedOptionId) {
             $correctOption = Option::where('question_id', $questionId)
                 ->where('is_correct', 1)
                 ->first();
-
 
             if (!$correctOption) {
                 continue;
             }
 
-
             if ($correctOption->id == $selectedOptionId) {
                 $score++;
             }
-
 
             Answer::create([
                 'user_id' => $userId,
@@ -221,7 +211,6 @@ return $months;
                 'attempt_number' => 1,
             ]);
         }
-
 
         $percentageScore = ($totalQuestions > 0) ? ($score / $totalQuestions) * 100 : 0;
 
@@ -252,7 +241,6 @@ return $months;
             'percentage' => $percentageScore
         ]);
     }
-
     public function showResults(Request $request)
     {
 //    dd($request);

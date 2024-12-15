@@ -101,7 +101,7 @@
                                 <h6 class="mb-1 fw-bold">{{ $quiz->title }}</h6>
                                 <p class="mb-0 text-muted">Created on {{ $quiz->created_at->format('F j, Y') }}</p>
                             </div>
-                            <span class="badge bg-primary px-5 py-3 "> View </span>
+                            <span class="badge bg-primary px-5 py-3 fs-6"> View </span>
                         </a>
                     @empty
                         <div class="alert alert-info" role="alert">

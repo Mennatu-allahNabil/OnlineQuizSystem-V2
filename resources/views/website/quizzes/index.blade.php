@@ -53,7 +53,15 @@
                             <p class="card-text">{{ $quiz->description }}</p>
 
                             <div class="d-flex justify-content-between align-items-center">
-                                <a href="javascript:void(0);" class="btn btn-primary" onclick="openQuizModal('{{ route('quiz.show', $quiz->id) }}', '{{ $quiz->title }}', '{{ $quiz->description }}', '{{ $quiz->time_limit }}', '{{ $quiz->quiz_type }}', '{{ $quiz->questions->count() }}')">Start Quiz</a>
+                                <a href="javascript:void(0);" class="btn btn-primary" onclick="openQuizModal(
+                                '{{ route('quiz.show', $quiz->id) }}',
+                                '{{ $quiz->title }}',
+                                '{{ $quiz->description }}',
+                                '{{ $quiz->time_limit }}',
+                                '{{ $quiz->quiz_type }}',
+                                '{{ $quiz->questions->count() }}',
+                                '{{ $quiz->topic->name ?? 'No Topic' }}'
+                                )">Start Quiz</a>
                                 <div>
                                     <div class="btn btn-warning text-dark" title="{{$quiz->time_limit ? 'with time limit' : 'with no time limit'}}">
                                         @if ($quiz->time_limit)
@@ -105,6 +113,10 @@
                         <td><span id="quizDescription"></span></td>
                     </tr>
                     <tr>
+                        <th>Topic:</th>
+                        <td><span id="quizTopic" class="text-capitalize"></span></td>
+                    </tr>
+                    <tr>
                         <th>Time Limit:</th>
                         <td><span id="quizTimeLimit"></span></td>
                     </tr>
@@ -117,6 +129,7 @@
                         <td><span id="quizQuestionsCount"></span></td>
                     </tr>
                 </table>
+
                 <div class="d-flex justify-content-evenly">
                     <button onclick="startQuiz()" class="btn btn-success">Start Quiz</button>
                     <button onclick="closeModal()" class="btn btn-danger">Cancel</button>
@@ -127,18 +140,30 @@
     </div>
 
     <script>
-        function openQuizModal(url, title, description, timeLimit, attemptType, questionsCount) {
-            // Set the quiz details in the modal
+        // function openQuizModal(url, title, description, timeLimit, attemptType, questionsCount) {
+        //     // Set the quiz details in the modal
+        //     document.getElementById('quizTitle').innerText = title;
+        //     document.getElementById('quizDescription').innerText = description;
+        //     document.getElementById('quizTimeLimit').innerText = timeLimit!=0 ? `${timeLimit} minutes` : 'No time limit';
+        //     document.getElementById('quizAttemptType').innerText = attemptType === 'multiple_attempts' ? 'Multiple attempts allowed' : 'One attempt only';
+        //     document.getElementById('quizQuestionsCount').innerText = questionsCount;
+        //
+        //     // Store the quiz URL to start the quiz later
+        //     window.quizUrl = url;
+        //
+        //     // Show the modal
+        //     document.getElementById('quizModal').style.display = 'flex';
+        // }
+        function openQuizModal(url, title, description, timeLimit, attemptType, questionsCount, topicName) {
             document.getElementById('quizTitle').innerText = title;
             document.getElementById('quizDescription').innerText = description;
-            document.getElementById('quizTimeLimit').innerText = timeLimit!=0 ? `${timeLimit} minutes` : 'No time limit';
+            document.getElementById('quizTimeLimit').innerText = timeLimit != 0 ? `${timeLimit} minutes` : 'No time limit';
             document.getElementById('quizAttemptType').innerText = attemptType === 'multiple_attempts' ? 'Multiple attempts allowed' : 'One attempt only';
             document.getElementById('quizQuestionsCount').innerText = questionsCount;
+            document.getElementById('quizTopic').innerText = topicName;
 
-            // Store the quiz URL to start the quiz later
             window.quizUrl = url;
 
-            // Show the modal
             document.getElementById('quizModal').style.display = 'flex';
         }
 
